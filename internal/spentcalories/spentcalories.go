@@ -19,7 +19,7 @@ func parseTraining(data string) (int, string, time.Duration, error) {
     parts := strings.Split(data, ",")
     
     if len(parts) != 3 {
-        return 0, "", 0, fmt.Errorf("неверный формат данных")
+        return 0, "", 0, fmt.Errorf("invalid data format")
     }
     
     stepsStr := strings.TrimSpace(parts[0])
