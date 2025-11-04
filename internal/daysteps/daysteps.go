@@ -16,13 +16,13 @@ func parsePackage(data string) (int, time.Duration, error) {
     parts := strings.Split(data, ",")
     
     if len(parts) != 2 {
-        return 0, 0, fmt.Errorf("неверный формат данных")
+        return 0, 0, fmt.Errorf("incorrect data format")
     }
     
     stepsStr := strings.TrimSpace(parts[0])
     steps, err := strconv.Atoi(stepsStr)
     if err != nil {
-        return 0, 0, fmt.Errorf("неверный формат шагов: %v", err)
+        return 0, 0, fmt.Errorf("неверный формат шагов: %w", err)
     }
     
     if steps <= 0 {
