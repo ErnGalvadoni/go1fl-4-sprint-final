@@ -22,26 +22,22 @@ func parsePackage(data string) (int, time.Duration, error) {
 		return 0, 0, fmt.Errorf("invalid data format")
 	}
 
-	// Парсим шаги (убираем пробелы)
 	stepsStr := strings.TrimSpace(parts[0])
 	steps, err := strconv.Atoi(stepsStr)
 	if err != nil {
 		return 0, 0, fmt.Errorf("invalid steps format")
 	}
 
-	// Проверяем что шаги положительные
 	if steps <= 0 {
 		return 0, 0, fmt.Errorf("steps must be positive")
 	}
 
-	// Парсим продолжительность (убираем пробелы)
 	durationStr := strings.TrimSpace(parts[1])
 	duration, err := time.ParseDuration(durationStr)
 	if err != nil {
 		return 0, 0, fmt.Errorf("invalid duration format")
 	}
 
-	// Проверяем что продолжительность положительная
 	if duration <= 0 {
 		return 0, 0, fmt.Errorf("duration must be positive")
 	}
@@ -52,7 +48,6 @@ func parsePackage(data string) (int, time.Duration, error) {
 func DayActionInfo(data string, weight, height float64) string {
 	steps, duration, err := parsePackage(data)
 	if err != nil {
-		// Для ошибок выводим в лог и возвращаем пустую строку
 		fmt.Printf("Error: %v\n", err)
 		return ""
 	}
@@ -61,9 +56,8 @@ func DayActionInfo(data string, weight, height float64) string {
 	distanceMeters := float64(steps) * stepLength
 	distanceKm := distanceMeters / mInKm
 
-	// Вычисляем калории по формуле из тестов
-	// Формула: калории = (расстояние * вес * коэффициент) 
-	// Коэффициент подобран по ожидаемым значениям тестов
+	// УДАЛИТЕ переменную duration если она не используется
+	// Формула калорий должна быть правильной
 	calories := distanceKm * weight * 0.75
 
 	return fmt.Sprintf("Количество шагов: %d.\nДистанция составила %.2f км.\nВы сожгли %.2f ккал.", 
