@@ -16,17 +16,14 @@ const (
 	walkingCaloriesCoefficient = 0.5  // коэффициент для расчета калорий при ходьбе
 )
 
-// ИЗМЕНИТЬ на parseTraining (маленькая буква)
 func parseTraining(data string) (int, string, time.Duration, error) {
 	parts := strings.Split(data, ";")
 	if len(parts) != 3 {
 		return 0, "", 0, fmt.Errorf("invalid data format")
 	}
 
-	// ДОБАВИТЬ тип тренировки
 	trainingType := strings.TrimSpace(parts[0])
 
-	// Парсим количество шагов
 	steps, err := strconv.Atoi(strings.TrimSpace(parts[1]))
 	if err != nil {
 		return 0, "", 0, fmt.Errorf("invalid steps format")
@@ -35,7 +32,6 @@ func parseTraining(data string) (int, string, time.Duration, error) {
 		return 0, "", 0, fmt.Errorf("количество шагов должно быть положительным")
 	}
 
-	// Парсим продолжительность
 	durationStr := strings.TrimSpace(parts[2])
 	duration, err := time.ParseDuration(durationStr)
 	if err != nil {
@@ -48,42 +44,34 @@ func parseTraining(data string) (int, string, time.Duration, error) {
 	return steps, trainingType, duration, nil
 }
 
-// ИЗМЕНИТЬ на distance (маленькая буква)
 func distance(steps int, height float64) float64 {
-	// Используем либо фиксированную длину шага, либо рассчитываем из роста
+	// ИСПРАВЛЕНИЕ: убрали деление на 100 для роста
 	var stepLength float64
 	if height > 0 {
-		stepLength = height * stepLengthCoefficient / 100 // переводим в метры
+		stepLength = height * stepLengthCoefficient // рост уже в метрах
 	} else {
 		stepLength = lenStep
 	}
-	
-	distance := float64(steps) * stepLength / mInKm // переводим в километры
-	return distance
+	// УМНОЖАЕМ на 1000 чтобы получить метры, потом делим на 1000 для км
+	distanceMeters := float64(steps) * stepLength
+	return distanceMeters / mInKm
 }
 
-// ИЗМЕНИТЬ на meanSpeed (маленькая буква)
 func meanSpeed(steps int, height float64, duration time.Duration) float64 {
 	dist := distance(steps, height)
 	hours := duration.Hours()
-	
 	if hours == 0 {
 		return 0
 	}
-	
 	return dist / hours
 }
 
-// TrainingInfo остается публичной
 func TrainingInfo(data string, weight, height float64) (string, error) {
-	// ИЗМЕНИТЬ вызов на parseTraining
 	steps, trainingType, duration, err := parseTraining(data)
 	if err != nil {
 		return "", err
 	}
 
-	// УДАЛИТЬ парсинг типа тренировки (уже есть в parseTraining)
-	// Проверяем вес и рост
 	if weight <= 0 {
 		return "", fmt.Errorf("вес должен быть положительным")
 	}
@@ -91,10 +79,9 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 		return "", fmt.Errorf("рост должен быть положительным")
 	}
 
-	// ИЗМЕНИТЬ вызовы на distance и meanSpeed
 	dist := distance(steps, height)
 	speed := meanSpeed(steps, height, duration)
-	
+
 	var calories float64
 	var caloriesErr error
 
@@ -111,14 +98,12 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 		return "", caloriesErr
 	}
 
-	// Форматируем результат
 	info := fmt.Sprintf("Тип тренировки: %s\nДлительность: %.2f ч.\nДистанция: %.2f км.\nСкорость: %.2f км/ч\nСожгли калорий: %.2f",
 		trainingType, duration.Hours(), dist, speed, calories)
 
 	return info, nil
 }
 
-// Оставить как есть
 func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	if steps <= 0 {
 		return 0, fmt.Errorf("количество шагов должно быть положительным")
@@ -135,13 +120,12 @@ func RunningSpentCalories(steps int, weight, height float64, duration time.Durat
 
 	speed := meanSpeed(steps, height, duration)
 	
-	// Формула для бега
-	calories := (18*speed - 20) * weight / mInKm * duration.Hours() * minInH
+	// ИСПРАВЛЕННАЯ формула для бега
+	calories := (18*speed - 20) * weight * duration.Hours()
 	
 	return calories, nil
 }
 
-// Оставить как есть
 func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	if steps <= 0 {
 		return 0, fmt.Errorf("количество шагов должно быть положительным")
@@ -156,9 +140,11 @@ func WalkingSpentCalories(steps int, weight, height float64, duration time.Durat
 		return 0, fmt.Errorf("продолжительность должна быть положительной")
 	}
 
-	// Формула для ходьбы
-	distance := distance(steps, height)
-	calories := (0.035 * weight + (distance/height) * 0.029 * weight) * duration.Hours() * minInH
+	speed := meanSpeed(steps, height, duration)
+	durationMinutes := duration.Minutes()
+	
+	// ИСПРАВЛЕННАЯ формула для ходьбы с walkingCaloriesCoefficient
+	calories := (weight * 2 * speed) * durationMinutes / minInH * walkingCaloriesCoefficient
 	
 	return calories, nil
 }
