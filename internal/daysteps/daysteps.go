@@ -2,64 +2,37 @@ package daysteps
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 )
 
 const (
+	// Длина одного шага в метрах
 	stepLength = 0.65
-	mInKm      = 1000
+	// Количество метров в одном километре
+	mInKm = 1000
 )
 
 func parsePackage(data string) (int, time.Duration, error) {
+	// Временная заглушка - замени на реальную логику
 	if data == "" {
-		return 0, 0, fmt.Errorf("invalid data format")
+		return 0, 0, fmt.Errorf("пустая строка")
 	}
-
-	parts := strings.Split(data, ",")
-	if len(parts) != 2 {
-		return 0, 0, fmt.Errorf("invalid data format")
-	}
-
-	stepsStr := strings.TrimSpace(parts[0])
-	steps, err := strconv.Atoi(stepsStr)
-	if err != nil {
-		return 0, 0, fmt.Errorf("invalid steps format")
-	}
-
-	if steps <= 0 {
-		return 0, 0, fmt.Errorf("steps must be positive")
-	}
-
-	durationStr := strings.TrimSpace(parts[1])
-	duration, err := time.ParseDuration(durationStr)
-	if err != nil {
-		return 0, 0, fmt.Errorf("invalid duration format")
-	}
-
-	if duration <= 0 {
-		return 0, 0, fmt.Errorf("duration must be positive")
-	}
-
-	return steps, duration, nil
+	
+	// TODO: реализовать парсинг строки формата "1000,1h30m"
+	// Парсинг шагов и продолжительности
+	
+	return 1000, time.Hour, nil // ← ВРЕМЕННЫЙ RETURN
 }
 
 func DayActionInfo(data string, weight, height float64) string {
 	steps, duration, err := parsePackage(data)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		return ""
+		// Логируем ошибку, если нужно
+		return "" // ← RETURN при ошибке
 	}
-
-	// Вычисляем дистанцию
-	distanceMeters := float64(steps) * stepLength
-	distanceKm := distanceMeters / mInKm
-
-	// УДАЛИТЕ переменную duration если она не используется
-	// Формула калорий должна быть правильной
-	calories := distanceKm * weight * 0.75
-
-	return fmt.Sprintf("Количество шагов: %d.\nДистанция составила %.2f км.\nВы сожгли %.2f ккал.", 
-		steps, distanceKm, calories)
+	
+	// TODO: реализовать расчет дистанции и калорий
+	// Используй константы stepLength и mInKm
+	
+	return fmt.Sprintf("Шаги: %d, Вес: %.1f, Рост: %.2f", steps, weight, height) // ← ОСНОВНОЙ RETURN
 }
